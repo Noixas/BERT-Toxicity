@@ -170,33 +170,37 @@ def get_comments_from_thread(parent_id):
 #%%
 comments_list_per_vid = list()
 vids_count = 0
-for vid_id in vid_ids:  
-    print(vids_count)      
-    comments_count = 0
-    response = get_comment_threads_from_video(vid_id)
-    first = True
-    nextPage = False
+try:
+    for vid_id in vid_ids:  
+        print(vids_count)      
+        comments_count = 0
+        response = get_comment_threads_from_video(vid_id)
+        first = True
+        nextPage = False
 
-    videoId = response['items'][0]['snippet']['videoId']
-    comments_list = list()
-    for comment in response['items']:
-        comments_list.append(comment['snippet']['topLevelComment']['snippet']['textOriginal'])
-        comments_count += 1
-    nextPage = response.get('nextPageToken')
-    i = 0
-    while nextPage is not None and i <6:
-        i += 1
-        print("nextPage",i,nextPage)
-        response = get_comment_threads_from_video(vid_id, nextPage)
+        videoId = response['items'][0]['snippet']['videoId']
+        comments_list = list()
         for comment in response['items']:
             comments_list.append(comment['snippet']['topLevelComment']['snippet']['textOriginal'])
             comments_count += 1
-
         nextPage = response.get('nextPageToken')
-        # items.extend(response['items'])    
-    comments = {"videoId":videoId,"commentsCount":comments_count,"comments":comments_list}; comments_count
-    comments_list_per_vid.append(comments)
-    vids_count += 1
+        i = 1
+        comments_per_video = 1500
+        while nextPage is not None and i <comments_per_video/100 :
+            i += 1
+            print("nextPage",i,nextPage)
+            response = get_comment_threads_from_video(vid_id, nextPage)
+            for comment in response['items']:
+                comments_list.append(comment['snippet']['topLevelComment']['snippet']['textOriginal'])
+                comments_count += 1
+
+            nextPage = response.get('nextPageToken')
+            # items.extend(response['items'])    
+        comments = {"videoId":videoId,"commentsCount":comments_count,"comments":comments_list}; comments_count
+        comments_list_per_vid.append(comments)
+        vids_count += 1
+except:
+    print("some error")
 #%%
 print(nextPage)
 
@@ -207,7 +211,7 @@ comments_list_per_vid
 #%%
 import json
 
-with open('comments_list_per_vid.json', 'w') as outfile:  
+with open('comments_videos_pewdiepie_1500.json', 'w') as outfile:  
     json.dump(comments_list_per_vid, outfile, indent=4)
 
 
