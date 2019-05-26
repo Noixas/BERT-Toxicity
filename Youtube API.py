@@ -169,101 +169,34 @@ def get_comments_from_thread(parent_id):
 
 #%%
 comments_list_per_vid = list()
-
-for vid_id in vid_ids:        
+vids_count = 0
+for vid_id in vid_ids:  
+    print(vids_count)      
     comments_count = 0
     response = get_comment_threads_from_video(vid_id)
-    print(response)
-    pop_keys_thread = ['kind','etag','snippet']
-    # pop_keys_comment = 
-    pop_keys_response = ['kind','etag']
-    for key in pop_keys_response: response.pop(key)
-
     first = True
     nextPage = False
 
     videoId = response['items'][0]['snippet']['videoId']
-    items = []
-
+    comments_list = list()
     for comment in response['items']:
-            comment.update(comment['snippet']['topLevelComment']['snippet'])
-            comment['totalReplyCount'] = comment['snippet']['totalReplyCount']
-            for key in pop_keys_thread: comment.pop(key)
-
-            pop = ['authorProfileImageUrl', 'authorChannelUrl', 'authorChannelId','videoId','textDisplay','canRate']
-            try:
-                 for key in pop: comment.pop(key)
-            except:
-                print("KeyError: 'authorChannelId'")
-        #     print("Comment text")
-        #     print(comment['snippet']['topLevelComment']['snippet']['textOriginal'])
-        #     print("Replies",comment['snippet']['totalReplyCount'])
-        #     comments_count += 1
-        #     if comment['totalReplyCount']>0:
-        #         comment['responses'] = get_comments_from_thread(comment["id"])
-        #         for key in ['kind','etag']: comment['responses'].pop(key)
-        # #         print(pprint.pprint(threadResponses))
-        #         for threadComment in comment['responses']['items']:
-        #             comments_count += 1
-        #             threadComment.update(threadComment['snippet'])
-        #             for key in pop_keys_thread: threadComment.pop(key)
-
-        #             pop = ['authorProfileImageUrl', 'authorChannelUrl', 'authorChannelId','textDisplay','canRate']
-        #             for key in pop: threadComment.pop(key)
-        #         comment['responses']['items'] = sorted(comment['responses']['items'], key = lambda i: (i['publishedAt']))
-    #             print(comment['responses']['items']) 
-        #             print("\t Reply text")
-        #             print("\t",threadComment['snippet']['textOriginal'])
-        #         print(comment)
+        comments_list.append(comment['snippet']['topLevelComment']['snippet']['textOriginal'])
+        comments_count += 1
     nextPage = response.get('nextPageToken')
-    items.extend(response['items'])
-
     i = 0
-    while nextPage is not None and i <7:
+    while nextPage is not None and i <6:
         i += 1
         print("nextPage",i,nextPage)
         response = get_comment_threads_from_video(vid_id, nextPage)
-        pop_keys_thread = ['kind','etag','snippet']
-        # pop_keys_comment = 
-        pop_keys_response = ['kind','etag']
-        for key in pop_keys_response: response.pop(key)
-        
         for comment in response['items']:
-            comment.update(comment['snippet']['topLevelComment']['snippet'])
-            comment['totalReplyCount'] = comment['snippet']['totalReplyCount']
-            for key in pop_keys_thread: comment.pop(key)
-
-            pop = ['authorProfileImageUrl', 'authorChannelUrl', 'authorChannelId','videoId','textDisplay','canRate']
-            try:
-                 for key in pop: comment.pop(key)
-            except:
-                print("KeyError: 'authorChannelId'")
-        #     print("Comment text")
-        #     print(comment['snippet']['topLevelComment']['snippet']['textOriginal'])
-        #     print("Replies",comment['snippet']['totalReplyCount'])
+            comments_list.append(comment['snippet']['topLevelComment']['snippet']['textOriginal'])
             comments_count += 1
 
-            # if comment['totalReplyCount']>0:
-            #     comment['responses'] = get_comments_from_thread(comment["id"])
-            #     for key in ['kind','etag']: comment['responses'].pop(key)
-        #         print(pprint.pprint(threadResponses))
-                # for threadComment in comment['responses']['items']:
-                #     comments_count += 1
-                #     threadComment.update(threadComment['snippet'])
-                #     for key in pop_keys_thread: threadComment.pop(key)
-
-                #     pop = ['authorProfileImageUrl', 'authorChannelUrl', 'authorChannelId','textDisplay','canRate']
-                #     for key in pop: threadComment.pop(key)
-                # comment['responses']['items'] = sorted(comment['responses']['items'], key = lambda i: (i['publishedAt']))
-
-        #             print("\t Reply text")
-        #             print("\t",threadComment['snippet']['textOriginal'])
-        #         print(comment)
         nextPage = response.get('nextPageToken')
-        items.extend(response['items'])    
-    comments = {"videoId":videoId,"commentsCount":comments_count,"comments":items}; comments_count
+        # items.extend(response['items'])    
+    comments = {"videoId":videoId,"commentsCount":comments_count,"comments":comments_list}; comments_count
     comments_list_per_vid.append(comments)
-
+    vids_count += 1
 #%%
 print(nextPage)
 
