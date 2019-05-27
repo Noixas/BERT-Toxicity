@@ -29,7 +29,7 @@ def get_latest_vids(channel_id):
         api_service_name, api_version,  developerKey = DEVELOPER_KEY)
 
     request = youtube.playlistItems().list(
-        part="snippet",
+        part="contentDetails",
         maxResults=50,
         playlistId=playlist_id
     )
@@ -45,7 +45,7 @@ response
 #%%
 import json
 
-with open('latest_vid_pewdiepie_content.json', 'w') as outfile:  
+with open('latest_vid_pewdiepie_content_27_05_19.json', 'w') as outfile:  
     json.dump(response, outfile, indent=4)
 #%%
 vid_ids = [vid['snippet']['resourceId']['videoId'] for vid in response['items']]
@@ -92,7 +92,7 @@ def get_comments_from_thread(parent_id):
 
 #%% [markdown]
 # # Get comment threads below a video
-get_comments_from_thread(555)
+# get_comments_from_thread(555)
 #%%
 # -*- coding: utf-8 -*-
 
@@ -185,7 +185,7 @@ try:
             comments_count += 1
         nextPage = response.get('nextPageToken')
         i = 1
-        comments_per_video = 1500
+        comments_per_video = 4000
         while nextPage is not None and i <comments_per_video/100 :
             i += 1
             print("nextPage",i,nextPage)
@@ -211,7 +211,7 @@ comments_list_per_vid
 #%%
 import json
 
-with open('comments_videos_pewdiepie_1500.json', 'w') as outfile:  
+with open('comments_videos_pewdiepie_4500.json', 'w') as outfile:  
     json.dump(comments_list_per_vid, outfile, indent=4)
 
 
@@ -219,15 +219,15 @@ with open('comments_videos_pewdiepie_1500.json', 'w') as outfile:
 print(comments_count)
 
 
-#%%
-import json
+# #%%
+# import json
 
-with open('example_comments.json', 'w') as outfile:  
-    json.dump(response, outfile, indent=4)
+# with open('example_comments.json', 'w') as outfile:  
+#     json.dump(response, outfile, indent=4)
 
 
-#%%
-with open('youtube_comments.json') as json_file:  
-    data = json.load(json_file)
+# #%%
+# with open('youtube_comments.json') as json_file:  
+#     data = json.load(json_file)
 
 
