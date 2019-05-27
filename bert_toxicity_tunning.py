@@ -135,14 +135,12 @@ for epoch in tq:
 
 torch.save(model.state_dict(), path)
 
-model_save_name = "bert_pytorch2.bin"
-path = F"/content/gdrive/My Drive/{model_save_name}"
-torch.save(model.state_dict(), path)
-
+#Re-load model from file
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=len(y_columns))
 model.load_state_dict(torch.load(path ))
 model.to(device)
 
+#Validation
 for param in model.parameters():
     param.requires_grad=False
 model.eval()
@@ -155,10 +153,8 @@ for i,(x_batch,)  in enumerate(tk0):
     pred = model(x_batch.to(device), attention_mask=(x_batch>0).to(device), labels=None)
     valid_preds[i*32:(i+1)*32]=pred[:,0].detach().cpu().squeeze().numpy()
 
-valid_preds[1000:2000]
-
 # From baseline kernel
-
+#Not used 27/05/19
 from sklearn import metrics
 from sklearn import model_selection
 def calculate_overall_auc(df, model_name):
@@ -227,64 +223,12 @@ def compute_bias_metrics_for_model(dataset,
     return pd.DataFrame(records).sort_values('subgroup_auc', ascending=True)
 
 test_df[MODEL_NAME]=torch.sigmoid(torch.tensor(valid_preds)).numpy()
-# for a in test_df[MODEL_NAME]:
-#   if a> .5:
-#     print (a)
 print(test_df[MODEL_NAME].describe())
-
-print(test_df[MODEL_NAME].first_valid_index())
 
 MODEL_NAME = 'model1'
 test_df[MODEL_NAME]=torch.sigmoid(torch.tensor(valid_preds)).numpy()
 TOXICITY_COLUMN = 'target'
 bias_metrics_df = compute_bias_metrics_for_model(test_df, identity_columns, MODEL_NAME, 'target')
-bias_metrics_df
-get_final_metric(bias_metrics_df, calculate_overall_auc(test_df, MODEL_NAME))
-
-import json
-with open('/content/gdrive/My Drive/Colab Notebooks/jigsaw-unintended-bias-in-toxicity-classification/comments_videos_pewdiepie_4000.json') as json_data:
-  d = json.load(json_data)
-predict_comments = d[10]["comments"]
-
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=len(y_columns))
-model.load_state_dict(torch.load(path ))
-model.to(device)
-
-MAX_SEQUENCE_LENGTH = 128
-# tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
-X_pew = convert_lines(predict_comments,MAX_SEQUENCE_LENGTH,tokenizer)
-
-for param in model.parameters():
-    param.requires_grad=False
-model.eval()
-valid_preds_pews = np.zeros((len(X_pew)))
-valid_pews = torch.utils.data.TensorDataset(torch.tensor(X_pew,dtype=torch.long))
-valid_loader_pews = torch.utils.data.DataLoader(valid_pews, batch_size=32, shuffle=False)
-
-tk0 = tqdm_notebook(valid_loader_pews)
-for i,(x_batch,)  in enumerate(tk0):
-    pred_pews = model(x_batch.to(device), attention_mask=(x_batch>0).to(device), labels=None)
-    valid_preds_pews[i*32:(i+1)*32]=pred_pews[:,0].detach().cpu().squeeze().numpy()
-
-test_df_pews=torch.sigmoid(torch.tensor(valid_preds_pews)).numpy()
-
-print(np.mean(test_df_pews))
-
-toxic = ([v for v in test_df_pews if v > .5])
-print(len(toxic))
-count = 0
-for i in range(len(test_df_pews)):
-  if test_df_pews[i] >.5:
-    count +=1
-#     print (i)
-#     print(predict_comments[i])
-#     print (test_df_pews[i])
-print(np.mean(test_df_pews))
-print(count)
-
-# print(test_df_pews.describe())
-# test_df_pews
-# valid_preds_pews[0:100]
-
-test_df_pews[0:100]
+print(bias_metrics_df)
+final = get_final_metric(bias_metrics_df, calculate_overall_auc(test_df, MODEL_NAME))
+print(final)
