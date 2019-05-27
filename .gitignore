@@ -103,3 +103,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 Private/
+bert_pytorch.bin
