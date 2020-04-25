@@ -2,7 +2,7 @@
 ## Introduction
 Pewdiepie has become the biggest English speaking channel on Youtube with currently more than 95 million subscribers. With this huge amount of audience, it is interesting to see how the audience reacts to his videos.
 
-In our paper we analyse the comments of 50 recent videos of Pewdiepie and we evaluate the polarity and toxicity leveraging libraries like TextBlob and the pre trained model BERT.
+In our [paper](https://github.com/Noixas/BERT-Toxicity/blob/master/Sentiment%20Analysis%20on%20the%20comments%20of%20Pewdiepie%20videos.pdf) we analyse the comments of 50 recent videos of Pewdiepie and we evaluate the polarity and toxicity leveraging libraries like TextBlob and the pre trained model BERT.
 
 ## Datasets
 - 200,000 top-threaded comments scraped from Pewdiepie videos with Youtube API (4,000 per video, 50 videos)
